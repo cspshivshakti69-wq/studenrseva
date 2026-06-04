@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Sidebar } from '@/components/Sidebar';
 import { BottomNav } from '@/components/BottomNav';
 import { mockDB, UserProfile } from '@/lib/mockData';
+import { supabase, isSupabaseEnabled } from '@/lib/supabaseClient';
 import { useTranslation } from '@/context/LanguageContext';
 import ChatBot from '@/components/ChatBot';
 
@@ -39,8 +40,11 @@ export default function DashboardLayout({
     setLoading(false);
   }, [router]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('ks_current_user');
+    if (isSupabaseEnabled && supabase) {
+      await supabase.auth.signOut();
+    }
     router.push('/login');
   };
 

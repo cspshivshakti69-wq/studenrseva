@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
-  // Only apply static export settings during production build (for GitHub Pages)
   ...(isProd && {
     output: "export",
     basePath: "/studenrseva",
@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   }),
   images: {
     unoptimized: true,
+  },
+  turbopack: {
+    root: path.resolve(__dirname), // fixes the "multiple lockfiles" warning
   },
 };
 

@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '@/context/LanguageContext';
 import { mockDB, Intervention, School } from '@/lib/mockData';
-import { 
-  AlertTriangle, ArrowLeft, ArrowRight, Check, Plus, 
+import {
+  AlertTriangle, ArrowLeft, ArrowRight, Check, Plus,
   Calendar, Building, User, ChevronRight, X, Sparkles, CheckCircle2
 } from 'lucide-react';
 
@@ -24,13 +24,13 @@ export default function InterventionsPage() {
   const [intervDescKn, setIntervDescKn] = useState('');
   const [intervCategory, setIntervCategory] = useState<'bilingual' | 'attendance' | 'kits' | 'transport'>('bilingual');
   const [targetDate, setTargetDate] = useState('2026-06-30');
-  
+
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const loadData = () => {
-    setInterventions(mockDB.getInterventions());
     const schoolsList = mockDB.getSchools();
+    setInterventions(mockDB.getInterventions());
     setSchools(schoolsList);
     if (schoolsList.length > 0 && !targetSchoolId) {
       setTargetSchoolId(schoolsList[0].id);
@@ -43,7 +43,6 @@ export default function InterventionsPage() {
 
   const moveStatus = (id: string, currentStatus: 'pending' | 'in_progress' | 'completed', direction: 'forward' | 'backward') => {
     let nextStatus: 'pending' | 'in_progress' | 'completed' = currentStatus;
-    
     if (direction === 'forward') {
       if (currentStatus === 'pending') nextStatus = 'in_progress';
       else if (currentStatus === 'in_progress') nextStatus = 'completed';
@@ -51,25 +50,19 @@ export default function InterventionsPage() {
       if (currentStatus === 'completed') nextStatus = 'in_progress';
       else if (currentStatus === 'in_progress') nextStatus = 'pending';
     }
-
     mockDB.updateInterventionStatus(id, nextStatus);
-    loadData(); // reload
+    loadData();
   };
 
   const handleAddInterventionSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
-
     if (!targetSchoolId || !intervTitleEn || !intervTitleKn) {
       setFormError('Please select school and fill in titles.');
       return;
     }
-
     const matchedSch = schools.find(s => s.id === targetSchoolId);
-    if (!matchedSch) {
-      setFormError('School not found.');
-      return;
-    }
+    if (!matchedSch) { setFormError('School not found.'); return; }
 
     mockDB.addIntervention({
       school_id: targetSchoolId,
@@ -82,19 +75,15 @@ export default function InterventionsPage() {
       category: intervCategory,
       status: 'pending',
       assigned_to_name: 'Dr. Ramesh Rao',
-      target_date: targetDate
+      target_date: targetDate,
     });
 
     setFormSuccess(true);
     loadData();
-
     setTimeout(() => {
-      setFormSuccess(false);
-      setShowAddDialog(false);
-      setIntervTitleEn('');
-      setIntervTitleKn('');
-      setIntervDescEn('');
-      setIntervDescKn('');
+      setFormSuccess(false); setShowAddDialog(false);
+      setIntervTitleEn(''); setIntervTitleKn('');
+      setIntervDescEn(''); setIntervDescKn('');
     }, 1000);
   };
 
@@ -104,7 +93,7 @@ export default function InterventionsPage() {
   const completedList = interventions.filter(i => i.status === 'completed');
 
   const getCategoryColor = (cat: string) => {
-    switch(cat) {
+    switch (cat) {
       case 'bilingual': return 'text-neon-cyan border-neon-cyan/20 bg-neon-cyan/5';
       case 'attendance': return 'text-neon-pink border-neon-pink/20 bg-neon-pink/5';
       case 'kits': return 'text-neon-purple border-neon-purple/20 bg-neon-purple/5';
@@ -114,7 +103,7 @@ export default function InterventionsPage() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-900 pb-5">
         <div>
@@ -140,7 +129,7 @@ export default function InterventionsPage() {
 
       {/* Kanban Board Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
+
         {/* Column 1: PENDING ( Assigned ) */}
         <div className="rounded-2xl border border-slate-900 bg-slate-950/40 p-4 space-y-4">
           <div className="flex justify-between items-center border-b border-slate-900 pb-3">
@@ -157,7 +146,7 @@ export default function InterventionsPage() {
             ) : (
               pendingList.map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-slate-900 bg-cyber-card/60 backdrop-blur-sm space-y-3.5 relative group">
-                  
+
                   {/* Category Badge */}
                   <span className={`px-2 py-0.5 rounded border text-[9px] font-bold font-mono uppercase inline-block ${getCategoryColor(item.category)}`}>
                     {t(`interv.cat.${item.category}`).split(' ')[0]}
@@ -222,7 +211,7 @@ export default function InterventionsPage() {
             ) : (
               progressList.map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-neon-cyan/15 bg-cyber-card/60 backdrop-blur-sm space-y-3.5 relative group">
-                  
+
                   {/* Category Badge */}
                   <span className={`px-2 py-0.5 rounded border text-[9px] font-bold font-mono uppercase inline-block ${getCategoryColor(item.category)}`}>
                     {t(`interv.cat.${item.category}`).split(' ')[0]}
@@ -295,7 +284,7 @@ export default function InterventionsPage() {
             ) : (
               completedList.map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-neon-teal/15 bg-cyber-card/40 backdrop-blur-sm space-y-3.5 relative group opacity-75 hover:opacity-100 transition-opacity">
-                  
+
                   {/* Category Badge */}
                   <span className="px-2 py-0.5 rounded border border-neon-teal/10 bg-neon-teal/5 text-neon-teal text-[9px] font-bold font-mono uppercase inline-block">
                     {t(`interv.cat.${item.category}`).split(' ')[0]}
@@ -346,7 +335,7 @@ export default function InterventionsPage() {
       {showAddDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
           <div className="w-full max-w-lg rounded-2xl border border-neon-cyan/30 bg-cyber-card p-6 shadow-glow-cyan/15 relative animate-in zoom-in-95 duration-200">
-            
+
             <button
               onClick={() => setShowAddDialog(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-neon-pink border border-transparent hover:border-slate-800 transition-colors"
@@ -377,7 +366,7 @@ export default function InterventionsPage() {
 
             <form onSubmit={handleAddInterventionSubmit} className="space-y-4 text-left">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
+
                 {/* Select Target School */}
                 <div>
                   <label className="block text-[10px] uppercase text-slate-400 font-mono tracking-widest mb-1">{t('interv.add.school')}</label>

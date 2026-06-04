@@ -3,20 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '@/context/LanguageContext';
 import { mockDB, School } from '@/lib/mockData';
-import { 
+import {
   Building, Search, Plus, MapPin, SlidersHorizontal, ArrowUpRight, X, Sparkles, CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SchoolsPage() {
   const { language, t } = useTranslation();
-  
+
   // Datasets state
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState('all');
   const [selectedTaluk, setSelectedTaluk] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Dialog state
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newNameEn, setNewNameEn] = useState('');
@@ -25,11 +25,10 @@ export default function SchoolsPage() {
   const [newTaluk, setNewTaluk] = useState('');
   const [newMedium, setNewMedium] = useState<'kannada' | 'english' | 'both'>('kannada');
   const [newDecline, setNewDecline] = useState('4.0');
-  
+
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Load schools from persistent local db
   const loadSchools = () => {
     setSchools(mockDB.getSchools());
   };
@@ -40,7 +39,7 @@ export default function SchoolsPage() {
 
   // Districts for filters
   const districtsList = Array.from(new Set(schools.map(s => s.district)));
-  
+
   // Taluks list depending on selected district
   const taluksList = Array.from(new Set(
     schools
@@ -64,41 +63,31 @@ export default function SchoolsPage() {
   const handleAddSchoolSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
-
     if (!newNameEn || !newNameKn || !newTaluk) {
       setFormError('Please fill in all bilingual school details.');
       return;
     }
-
     try {
       mockDB.addSchool({
-        name_en: newNameEn,
-        name_kn: newNameKn,
-        district: newDistrict,
-        taluk: newTaluk,
+        name_en: newNameEn, name_kn: newNameKn,
+        district: newDistrict, taluk: newTaluk,
         enrolment_decline_rate: parseFloat(newDecline) || 3.0,
-        primary_medium: newMedium
+        primary_medium: newMedium,
       });
-
       setFormSuccess(true);
-      loadSchools(); // refresh records
-
-      // Reset
+      loadSchools();
       setTimeout(() => {
-        setFormSuccess(false);
-        setShowAddDialog(false);
-        setNewNameEn('');
-        setNewNameKn('');
-        setNewTaluk('');
+        setFormSuccess(false); setShowAddDialog(false);
+        setNewNameEn(''); setNewNameKn(''); setNewTaluk('');
       }, 1000);
-    } catch (err) {
+    } catch {
       setFormError('Failed to register school.');
     }
   };
 
   return (
     <div className="space-y-6">
-      
+
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-900 pb-5">
         <div>
@@ -124,7 +113,7 @@ export default function SchoolsPage() {
 
       {/* Directory Filter Panel */}
       <div className="p-4 rounded-xl border border-slate-900 bg-slate-950/20 backdrop-blur-sm flex flex-col md:flex-row gap-3 items-center">
-        
+
         {/* Search */}
         <div className="relative flex-1 w-full">
           <input
@@ -181,13 +170,12 @@ export default function SchoolsPage() {
             const isHigh = sch.risk_score >= 70;
             const isElevated = sch.risk_score >= 50 && sch.risk_score < 70;
             return (
-              <div 
-                key={sch.id} 
-                className={`p-5 rounded-2xl border transition-all duration-200 hover:translate-y-[-2px] cyber-glass flex flex-col justify-between ${
-                  isHigh ? 'border-glow-purple border-neon-pink/20 hover:border-neon-pink/40' : 
-                  isElevated ? 'border-glow-purple border-neon-purple/20 hover:border-neon-purple/40' : 
-                  'border-glow-teal border-neon-teal/20 hover:border-neon-teal/40'
-                }`}
+              <div
+                key={sch.id}
+                className={`p-5 rounded-2xl border transition-all duration-200 hover:translate-y-[-2px] cyber-glass flex flex-col justify-between ${isHigh ? 'border-glow-purple border-neon-pink/20 hover:border-neon-pink/40' :
+                  isElevated ? 'border-glow-purple border-neon-purple/20 hover:border-neon-purple/40' :
+                    'border-glow-teal border-neon-teal/20 hover:border-neon-teal/40'
+                  }`}
               >
                 <div>
                   {/* District / Taluk Badge */}
@@ -197,11 +185,10 @@ export default function SchoolsPage() {
                       <span>{sch.district} • {sch.taluk}</span>
                     </div>
 
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-                      isHigh ? 'bg-neon-pink/15 text-neon-pink' :
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${isHigh ? 'bg-neon-pink/15 text-neon-pink' :
                       isElevated ? 'bg-neon-purple/15 text-neon-purple' :
-                      'bg-neon-teal/15 text-neon-teal'
-                    }`}>
+                        'bg-neon-teal/15 text-neon-teal'
+                      }`}>
                       {t('school.risk_index')}: {sch.risk_score}%
                     </span>
                   </div>
@@ -248,7 +235,7 @@ export default function SchoolsPage() {
       {showAddDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
           <div className="w-full max-w-lg rounded-2xl border border-neon-cyan/30 bg-cyber-card p-6 shadow-glow-cyan/15 relative animate-in zoom-in-95 duration-200">
-            
+
             {/* Close Button */}
             <button
               onClick={() => setShowAddDialog(false)}
@@ -379,7 +366,7 @@ export default function SchoolsPage() {
                 >
                   {t('common.cancel')}
                 </button>
-                
+
                 <button
                   type="submit"
                   disabled={formSuccess}

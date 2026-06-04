@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslation } from '@/context/LanguageContext';
-import { Globe, ArrowRight, BookOpen, Brain, Activity, ShieldAlert, Award } from 'lucide-react';
+import { Globe, ArrowRight, BookOpen, Brain, ShieldAlert, Award } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LandingPage() {
@@ -174,6 +174,7 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+
       </main>
 
       {/* Footer */}

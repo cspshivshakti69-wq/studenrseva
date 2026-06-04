@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from '@/context/LanguageContext';
 import { mockDB, School, EnrolmentTrend } from '@/lib/mockData';
 import { KarnatakaMap } from '@/components/KarnatakaMap';
-import { 
+import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import { 
+import {
   Building, TrendingDown, ShieldAlert, Map, ArrowUpRight, Search, SlidersHorizontal, BookOpen
 } from 'lucide-react';
 import Link from 'next/link';
@@ -25,8 +25,12 @@ export default function DashboardHome() {
 
   // Load datasets on mount
   useEffect(() => {
-    setSchools(mockDB.getSchools());
-    setEnrolmentTrends(mockDB.getEnrolmentTrends());
+    const loadData = async () => {
+      setSchools(mockDB.getSchools());
+      setEnrolmentTrends(mockDB.getEnrolmentTrends());
+    };
+
+    loadData();
   }, []);
 
   // Filter school roster lists based on interactive district map, search text, and instruction medium
@@ -48,12 +52,12 @@ export default function DashboardHome() {
 
   // Calculate high-fidelity real-time metrics
   const totalMonitored = filteredSchools.length;
-  
+
   // Total students enrolled
   const totalStudentsEnrolled = filteredSchools.reduce((sum, s) => sum + s.total_students, 0);
 
   // Average enrolment decline rate
-  const avgDecline = filteredSchools.length > 0 
+  const avgDecline = filteredSchools.length > 0
     ? parseFloat((filteredSchools.reduce((sum, s) => sum + s.enrolment_decline_rate, 0) / filteredSchools.length).toFixed(1))
     : 0;
 
@@ -84,7 +88,7 @@ export default function DashboardHome() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Interactive Title Area */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-5">
         <div>
@@ -169,10 +173,10 @@ export default function DashboardHome() {
 
       {/* Main Charts & Visual Interactive Map Frame */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Side: SVG Map representation ( Takes 1 column on big screens ) */}
         <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-900 bg-cyber-card/60 backdrop-blur-md flex flex-col justify-between">
-          <KarnatakaMap 
+          <KarnatakaMap
             selectedDistrict={selectedDistrict}
             onSelectDistrict={setSelectedDistrict}
             schoolsData={schools}
@@ -181,7 +185,7 @@ export default function DashboardHome() {
 
         {/* Right Side: Primary charts ( Takes 2 columns ) */}
         <div className="lg:col-span-2 space-y-6">
-          
+
           {/* Enrolment Trends comparing Kannada vs English ( Line Chart ) */}
           <div className="p-5 rounded-2xl border border-slate-900 bg-cyber-card/60 backdrop-blur-md">
             <h3 className="text-xs md:text-sm font-bold text-white font-mono uppercase tracking-wider mb-4 flex items-center justify-between">
@@ -191,34 +195,34 @@ export default function DashboardHome() {
               </span>
               <span className="text-[10px] text-slate-500 font-normal">Medium Comparison</span>
             </h3>
-            
+
             <div className="h-64 md:h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={enrolmentTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#0f172a" vertical={false} />
                   <XAxis dataKey="year" stroke="#475569" fontSize={11} fontStyle="italic" />
                   <YAxis stroke="#475569" fontSize={11} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#070420', border: '1px solid rgba(6,182,212,0.3)', color: '#fff' }}
                     labelFormatter={(label) => `Academic Year: ${label}`}
                   />
                   <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: 11 }} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="kannada" 
-                    name={t('dash.kannada_medium')} 
-                    stroke="#06b6d4" 
+                  <Line
+                    type="monotone"
+                    dataKey="kannada"
+                    name={t('dash.kannada_medium')}
+                    stroke="#06b6d4"
                     strokeWidth={2.5}
-                    activeDot={{ r: 6 }} 
+                    activeDot={{ r: 6 }}
                     dot={{ r: 3 }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="english" 
-                    name={t('dash.english_medium')} 
-                    stroke="#a855f7" 
+                  <Line
+                    type="monotone"
+                    dataKey="english"
+                    name={t('dash.english_medium')}
+                    stroke="#a855f7"
                     strokeWidth={2.5}
-                    activeDot={{ r: 6 }} 
+                    activeDot={{ r: 6 }}
                     dot={{ r: 3 }}
                   />
                 </LineChart>
@@ -244,14 +248,14 @@ export default function DashboardHome() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#0f172a" vertical={false} />
                     <XAxis dataKey="name" stroke="#475569" fontSize={10} />
                     <YAxis stroke="#475569" fontSize={11} domain={[0, 100]} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ backgroundColor: '#070420', border: '1px solid rgba(168,85,247,0.3)', color: '#fff' }}
                     />
-                    <Bar 
-                      dataKey="Risk Score" 
-                      name="Risk Score %" 
-                      fill="#a855f7" 
-                      radius={[4, 4, 0, 0]} 
+                    <Bar
+                      dataKey="Risk Score"
+                      name="Risk Score %"
+                      fill="#a855f7"
+                      radius={[4, 4, 0, 0]}
                       maxBarSize={30}
                     />
                   </BarChart>
@@ -265,7 +269,7 @@ export default function DashboardHome() {
 
       {/* Interactive At-Risk Schools Directory Checklist */}
       <div className="p-5 rounded-2xl border border-slate-900 bg-cyber-card/75 backdrop-blur-md">
-        
+
         {/* Header Controls */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-900 mb-4">
           <div>
@@ -354,11 +358,10 @@ export default function DashboardHome() {
                       <td className="py-3.5 pr-2 text-slate-300 font-mono">{sch.total_students}</td>
                       <td className="py-3.5 pr-2 text-neon-pink font-mono">-{sch.enrolment_decline_rate}%</td>
                       <td className="py-3.5 pr-2 text-center">
-                        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-mono ${
-                          isHigh ? 'bg-neon-pink/15 text-neon-pink border border-neon-pink/20 shadow-glow-purple/5' :
+                        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-mono ${isHigh ? 'bg-neon-pink/15 text-neon-pink border border-neon-pink/20 shadow-glow-purple/5' :
                           isElevated ? 'bg-neon-purple/15 text-neon-purple border border-neon-purple/20' :
-                          'bg-neon-teal/15 text-neon-teal border border-neon-teal/20'
-                        }`}>
+                            'bg-neon-teal/15 text-neon-teal border border-neon-teal/20'
+                          }`}>
                           {sch.risk_score}%
                         </span>
                       </td>
@@ -379,7 +382,7 @@ export default function DashboardHome() {
           )}
         </div>
       </div>
-      
+
     </div>
   );
 }
